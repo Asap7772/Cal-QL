@@ -7,13 +7,15 @@ cql_min_q_weights=(20 1 5 10 5 5)
 online_min_q_weights=(-1)
 seeds=(24 42)
 gpus=(1 2 3 4 5 6 7 0)
-num_max=1
+num_max=12
 max_online_env_steps=1e6
 
+cql_num=-1
 for env in ${envs[@]}; do
+cql_num=$((cql_num+1))
 for online_min_q_weight in ${online_min_q_weights[@]}; do
 for seed in ${seeds[@]}; do
-    cql_min_q_weight=${cql_min_q_weights[$exp_num]}
+    cql_min_q_weight=${cql_min_q_weights[$cql_num]}
     gpu=${gpus[$exp_num % ${#gpus[@]}]}
     export CUDA_VISIBLE_DEVICES=$gpu
 
