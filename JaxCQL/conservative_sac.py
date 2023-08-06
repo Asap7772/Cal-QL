@@ -366,6 +366,10 @@ class ConservativeSAC(object):
             new_train_states['qf2'].params, target_qf_params['qf2'],
             self.config.soft_target_update_rate
         )
+        new_target_qf_params['qf_sarsa'] = update_target_network(
+            new_train_states['qf_sarsa'].params, target_qf_params['qf_sarsa'],
+            self.config.soft_target_update_rate
+        )
 
         metrics = collect_jax_metrics(
             aux_values,

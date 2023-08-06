@@ -7,7 +7,7 @@ cql_min_q_weights=(20 1 5 10 5 5)
 online_min_q_weights=(5 1)
 seeds=(24 42)
 gpus=(0 1 2 3 4 5 6 7)
-num_max=1
+num_max=24
 max_online_env_steps=1e6
 
 for env in ${envs[@]}; do
@@ -19,6 +19,7 @@ for seed in ${seeds[@]}; do
 
     echo "Running experiment $exp_num on GPU $gpu: $env, seed=$seed, cql_min_q_weight=$cql_min_q_weight, online_min_q_weight=$online_min_q_weight"
     
+    now=$(date +"%Y%m%d_%H%M%S")
     command="XLA_PYTHON_CLIENT_PREALLOCATE=false python -m JaxCQL.conservative_sac_main \
     --env=$env \
     --logging.online \
@@ -37,7 +38,9 @@ for seed in ${seeds[@]}; do
     --mixing_ratio=0.5 \
     --reward_scale=1.0 \
     --reward_bias=0.0 \
-    --enable_calql=True"
+    --enable_calql=True \
+    --sarsa_lb=True \
+    --logging.output_dir=/tmp/Cal_QL_gym_${env}_${now} &"
     
     echo -e "$command\n"
 
@@ -45,6 +48,7 @@ for seed in ${seeds[@]}; do
         eval $command
     fi
 
+    sleep 20
     exp_num=$((exp_num+1))
 done
 done
