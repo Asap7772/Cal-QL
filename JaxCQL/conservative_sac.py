@@ -255,8 +255,14 @@ class ConservativeSAC(object):
                 cql_q1_next_actions = forward_qf(train_params['qf1'], observations, cql_next_actions)
                 cql_q2_next_actions = forward_qf(train_params['qf2'], observations, cql_next_actions)
 
+
+                if sarsa_lb:
+                    lower_bound_inital_value = jax.lax.stop_gradient(q_sarsa_pred).reshape(-1, 1)
+                else:
+                    lower_bound_inital_value = batch['mc_returns'].reshape(-1, 1)
+
                 """ Cal-QL: prepare for Cal-QL, and calculate how much data will be lower bounded for logging """
-                lower_bounds = jnp.repeat(batch['mc_returns'].reshape(-1, 1), cql_q1_current_actions.shape[1], axis=1)
+                lower_bounds = jnp.repeat(lower_bound_inital_value, cql_q1_current_actions.shape[1], axis=1)
                 num_vals = jnp.sum(lower_bounds==lower_bounds)
                 bound_rate_cql_q1_current_actions = jnp.sum(cql_q1_current_actions < lower_bounds) / num_vals
                 bound_rate_cql_q2_current_actions = jnp.sum(cql_q2_current_actions  < lower_bounds) / num_vals
